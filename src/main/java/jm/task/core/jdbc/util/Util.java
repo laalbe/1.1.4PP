@@ -12,6 +12,7 @@ public class Util {
         try {
             con = DriverManager.getConnection(url, username, password);
             System.out.println("Соединение установлено");
+            con.setAutoCommit(false);
         } catch (SQLException e) {
             System.err.println("Невозможно установить соединение");
         }
