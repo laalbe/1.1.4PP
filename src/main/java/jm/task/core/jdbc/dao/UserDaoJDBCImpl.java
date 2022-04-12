@@ -35,9 +35,10 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     public void saveUser(String name, String lastName, byte age) {
-        try (Connection connection = Util.getConnection();
-             PreparedStatement prepst = connection.prepareStatement("INSERT INTO Users(NAME, LASTNAME, AGE) " +
+        Connection connection = null;
+        try (PreparedStatement prepst = connection.prepareStatement("INSERT INTO Users(NAME, LASTNAME, AGE) " +
                      "VALUES(?, ?, ?)")) {
+            connection = Util.getConnection();
             connection.setAutoCommit(false);
             prepst.setString(1, name);
             prepst.setString(2, lastName);
@@ -47,7 +48,7 @@ public class UserDaoJDBCImpl implements UserDao {
             connection.commit();
         } catch (SQLException e) {
             try {
-                Util.getConnection().rollback();
+                connection.rollback();
             } catch (SQLException ex) {
                 ex.printStackTrace();
             }
@@ -57,8 +58,10 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     public void removeUserById(long id) {
-        try (Connection connection = Util.getConnection(); PreparedStatement ps = connection.prepareStatement("DELETE " +
+        Connection connection = null;
+        try (PreparedStatement ps = connection.prepareStatement("DELETE " +
                 "FROM Users WHERE ID = ?")) {
+            connection = Util.getConnection();
             connection.setAutoCommit(false);
             ps.setLong(1,id);
             ps.executeUpdate();
@@ -66,7 +69,7 @@ public class UserDaoJDBCImpl implements UserDao {
             connection.commit();
         } catch (SQLException e) {
             try {
-                Util.getConnection().rollback();
+                connection.rollback();
             } catch (SQLException ex) {
                 ex.printStackTrace();
             }
@@ -96,13 +99,15 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     public void cleanUsersTable() {
-        try (Connection connection = Util.getConnection(); Statement statement = connection.createStatement()) {
+        Connection connection = null;
+        try (Statement statement = connection.createStatement()) {
+            connection = Util.getConnection();
             statement.executeUpdate("DELETE FROM Users");
             System.out.println("Данные из таблицы были удалены");
             connection.commit();
         } catch (SQLException e) {
             try {
-                Util.getConnection().rollback();
+                connection.rollback();
             } catch (SQLException ex) {
                 ex.printStackTrace();
             }
